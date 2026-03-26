@@ -68,9 +68,9 @@ public class ApiResponse<T> implements Serializable {
     }
 
     /**
-     * 成功响应 (带消息)
+     * 成功响应 (数据在前，消息在后)
      */
-    public static <T> ApiResponse<T> success(String message, T data) {
+    public static <T> ApiResponse<T> success(T data, String message) {
         return ApiResponse.<T>builder()
                 .code(200)
                 .message(message)
@@ -88,6 +88,13 @@ public class ApiResponse<T> implements Serializable {
                 .message(message)
                 .timestamp(System.currentTimeMillis())
                 .build();
+    }
+
+    /**
+     * 错误响应 (带消息，默认错误码)
+     */
+    public static <T> ApiResponse<T> error(String message) {
+        return error(500, message);
     }
 
     /**

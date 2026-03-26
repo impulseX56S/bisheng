@@ -39,7 +39,6 @@ public @interface ApiSignature {
 
     /**
      * 排除的路径模式 (在方法级别使用时有效)
-     * 例如：{"**/public/**", "**/health"}
      */
     String[] excludePatterns() default {};
 }
