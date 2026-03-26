@@ -1,0 +1,102 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: secure-api-demo
+    
+  # MariaDB 数据库配置
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 1234
+    # HikariCP 连接池配置
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      pool-name: SecureApiHikariCP
+      
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  # Mapper XML 文件位置
+  mapper-locations: classpath:/mapper/**/*.xml
+  # 实体类包路径
+  type-aliases-package: com.example.security.entity
+  configuration:
+    # 开启驼峰命名转换
+    map-underscore-to-camel-case: true
+    # 开启日志
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      # 主键类型：自增
+      id-type: auto
+      # 逻辑删除字段
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Sa-Token 配置
+sa-token:
+  # token 名称 (同时也是 cookie 名称)
+  token-name: satoken
+  # token 有效期，单位 s 默认 30 天，-1 代表永不过期
+  timeout: 2592000
+  # token 临时有效期 (指定时间内无操作就视为 token 过期) 单位：秒
+  activity-timeout: -1
+  # 是否允许同一账号并发登录 (为 true 时允许一起登录，为 false 时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个 token (为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token)
+  is-share: false
+  # token 风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: true
+  # 是否从 cookie 中读取 token
+  is-read-cookie: false
+  # 是否从 head 中读取 token
+  is-read-header: true
+  # token 前缀
+  token-prefix: Bearer
+
+# 自定义安全配置
+security:
+  # 签名配置
+  signature:
+    # 是否启用签名验证
+    enabled: true
+    # 签名时间戳有效时间 (秒)，防止重放攻击
+    timestamp-window: 300
+    # 随机数 (nonce) 在 Redis 中的过期时间 (秒)，应大于等于 timestamp-window
+    nonce-expire: 300
+    # 签名算法：HMACSHA256, HMACSHA1, MD5
+    algorithm: HMACSHA256
+    # 派生密钥的盐 (生产环境请修改并妥善保管)
+    derive-salt: "your-master-secret-salt-2024"
+    # 派生密钥的迭代次数
+    derive-iterations: 1000
+
+# 日志配置
+logging:
+  level:
+    com.example.security: DEBUG
+    cn.dev33.satoken: INFO
+    com.example.security.mapper: DEBUG
